@@ -15,6 +15,7 @@ type User struct {
 	InSession      primitive.ObjectID   `bson:"in_session" json:"in_session"`
 	Friends        []primitive.ObjectID `bson:"friends" json:"friends"`
 	PebbleUID      string               `bson:"pebble_uid" json:"pebble_uid"`
+	Name           string               `bson:"name" json:"name"`
 	PebbleSecret   string               `bson:"pebble_secret" json:"pebble_secret"`
 	PebblePassword string               `bson:"pebble_password" json:"pebble_password"`
 }

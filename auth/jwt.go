@@ -49,13 +49,15 @@ func ValidateAuthToken(tokenString string) (bool, error, models.UnpackedAccessTo
 	sub, ok1 := claims["sub"].(string)
 	acr, ok2 := claims["acr"].(string)
 	email, ok3 := claims["email"].(string)
+	name, _ := claims["name"].(string)
 	if !ok1 || !ok2 || !ok3 {
 		return false, fmt.Errorf("claim not found or not a string"), models.UnpackedAccessToken{}
 	}
 
 	return true, nil, models.UnpackedAccessToken{
-		UID:   sub,
+		UID:   sub[:24],
 		Acr:   acr,
 		Email: email,
+		Name:  name,
 	}
 }

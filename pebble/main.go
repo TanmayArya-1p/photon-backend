@@ -6,12 +6,11 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"photon-backend/models"
 )
 
 var (
-	serverURL = os.Getenv("PEBBLE_SERVER_URL")
+	serverURL = "https://lol.onetincan.tech"
 )
 
 func createFormData(fields map[string]string) (*bytes.Buffer, string, error) {
@@ -71,7 +70,6 @@ func Register(username, password string) (models.PebbleLoginResponse, error) {
 	if err != nil {
 		return models.PebbleLoginResponse{}, err
 	}
-
 	resp, err := http.Post(serverURL+"/user/create", contentType, body)
 	if err != nil {
 		return models.PebbleLoginResponse{}, err
@@ -88,9 +86,8 @@ func Register(username, password string) (models.PebbleLoginResponse, error) {
 	if err != nil {
 		return models.PebbleLoginResponse{}, err
 	}
-
 	resp2 := models.PebbleLoginResponse{
-		ClientSecret: result["Client-Secret"].(string),
+		ClientSecret: result["ClientSecret"].(string),
 		UID:          result["UID"].(string),
 	}
 

@@ -7,6 +7,9 @@ import (
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	}
 	user := r.Context().Value(models.UserContextKey).(models.User)
 	w.Header().Set("Content-Type", "application/json")
 	user.PebblePassword = ""

@@ -15,7 +15,7 @@ var usersCollection *mongo.Collection
 var sessionsCollection *mongo.Collection
 var ctx = context.Background()
 
-func init() {
+func Connect() {
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING"))
 	err := error(nil)
 	client, err = mongo.Connect(ctx, clientOptions)

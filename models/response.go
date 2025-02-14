@@ -9,4 +9,5 @@ type UnpackedAccessToken struct {
 	Acr   string `json:"acr"`
 	UID   string `json:"uid"`
 	Email string `json:"email"`
+	Name  string `json:"name"`
 }

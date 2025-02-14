@@ -22,6 +22,12 @@ func CreateNewUserMapping(JWTdecoded models.UnpackedAccessToken) models.User {
 	uid := JWTdecoded.UID
 	acr := JWTdecoded.Acr
 
+	exUS, errN := mongo.GetUserByID(mongo.ObjIDfromString(uid))
+	if errN == nil {
+		fmt.Println("User Already Exists")
+		return exUS
+	}
+
 	password := uid + ":" + PASSWORD_KEY
 	nh := sha256.New()
 	nh.Write([]byte(password))
@@ -43,8 +49,12 @@ func CreateNewUserMapping(JWTdecoded models.UnpackedAccessToken) models.User {
 		PebbleSecret:   registrationResponse.ClientSecret,
 		PebblePassword: hashedPassword[:10],
 		Email:          JWTdecoded.Email,
+		Name:           JWTdecoded.Name,
 	}
-	mongo.InsertUser(&nU)
+	_, err = mongo.InsertUser(&nU)
+	if err != nil {
+		fmt.Println("Error Inserting User.", err)
+	}
 	return nU
 }
 
