@@ -2,10 +2,12 @@ package pebble
 
 import (
 	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"photon-backend/models"
 )
 
 var (
@@ -25,52 +27,74 @@ func createFormData(fields map[string]string) (*bytes.Buffer, string, error) {
 	return body, writer.FormDataContentType(), nil
 }
 
-func Login(uid, pwd string) (string, error) {
+func Login(uid, pwd string) (models.PebbleLoginResponse, error) {
+
 	fields := map[string]string{
 		"uid":      uid,
 		"password": pwd,
 	}
 	body, contentType, err := createFormData(fields)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
 	}
 
 	resp, err := http.Post(serverURL+"/user/login", contentType, body)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
+	}
+	var result map[string]interface{}
+	err = json.Unmarshal(respBody, &result)
+	if err != nil {
+		return models.PebbleLoginResponse{}, err
 	}
 
-	return string(respBody), nil
+	resp2 := models.PebbleLoginResponse{
+		ClientSecret: result["Client-Secret"].(string),
+		UID:          result["UID"].(string),
+	}
+
+	return resp2, nil
 }
 
-func Register(username, password string) (string, error) {
+func Register(username, password string) (models.PebbleLoginResponse, error) {
 	fields := map[string]string{
 		"username": username,
 		"password": password,
 	}
 	body, contentType, err := createFormData(fields)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
 	}
 
 	resp, err := http.Post(serverURL+"/user/create", contentType, body)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return models.PebbleLoginResponse{}, err
 	}
 
-	return string(respBody), nil
+	var result map[string]interface{}
+	err = json.Unmarshal(respBody, &result)
+	if err != nil {
+		return models.PebbleLoginResponse{}, err
+	}
+
+	resp2 := models.PebbleLoginResponse{
+		ClientSecret: result["Client-Secret"].(string),
+		UID:          result["UID"].(string),
+	}
+
+	return resp2, nil
 }
 
 func CreateSession(uid string, secret string, sesKey string) (string, error) {

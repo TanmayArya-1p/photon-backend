@@ -17,11 +17,11 @@ func InsertUser(u *models.User) models.User {
 	return *u
 }
 
-func GetUserByID(id primitive.ObjectID) models.User {
+func GetUserByID(id primitive.ObjectID) (models.User, error) {
 	var u models.User
-	err := usersCollection.FindOne(ctx, primitive.M{"_id": id}).Decode(&u)
+	err := usersCollection.FindOne(ctx, primitive.M{"oauth_uid": id}).Decode(&u)
 	if err != nil {
-		fmt.Println("Error fetching user by ID", err)
+		return models.User{}, fmt.Errorf("error fetching user by ID: %w", err)
 	}
-	return u
+	return u, nil
 }

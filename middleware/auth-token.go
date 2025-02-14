@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	auth "photon-backend/auth"
+	"photon-backend/models"
 )
 
 func AuthTokenMiddleware(next http.Handler) http.Handler {
@@ -14,7 +15,7 @@ func AuthTokenMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		tokenString := authHeader[len("Bearer "):]
-		valid, err, uid := auth.ValidateAuthToken(tokenString)
+		valid, err, unpackedjwt := auth.ValidateAuthToken(tokenString)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
@@ -23,7 +24,7 @@ func AuthTokenMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		r = r.WithContext(context.WithValue(r.Context(), "uid", uid))
+		r = r.WithContext(context.WithValue(r.Context(), models.UnpackedAT, unpackedjwt))
 		next.ServeHTTP(w, r)
 	})
 }
