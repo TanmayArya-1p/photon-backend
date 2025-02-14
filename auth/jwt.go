@@ -10,10 +10,10 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 )
 
-func ValidateAuthToken(tokenString string) (bool, error) {
+func ValidateAuthToken(tokenString string) (bool, error, string) {
 	jwks, err := jwk.Fetch(context.Background(), os.Getenv("AUTHENTIK_JWKS_URL"))
 	if err != nil {
-		return false, fmt.Errorf("failed to fetch JWKs: %v", err)
+		return false, fmt.Errorf("failed to fetch JWKs: %v", err), ""
 	}
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
@@ -31,15 +31,24 @@ func ValidateAuthToken(tokenString string) (bool, error) {
 		if err := key.Raw(&rsaKey); err != nil {
 			return nil, fmt.Errorf("failed to parse RSA public key: %v", err)
 		}
-
 		return &rsaKey, nil
 	})
 	if err != nil {
-		return false, fmt.Errorf("error parsing token: %v", err)
+		return false, fmt.Errorf("error parsing token: %v", err), ""
+	}
+	if !token.Valid {
+		return false, fmt.Errorf("invalid token"), ""
 	}
 
-	if !token.Valid {
-		return false, fmt.Errorf("invalid token")
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return false, fmt.Errorf("failed to extract claims"), ""
 	}
-	return true, nil
+
+	sub, ok := claims["uid"].(string)
+	if !ok {
+		return false, fmt.Errorf("'uid' claim not found or not a string"), ""
+	}
+
+	return true, nil, sub
 }
