@@ -12,12 +12,13 @@ import (
 
 var client *mongo.Client
 var usersCollection *mongo.Collection
-var clustersCollection *mongo.Collection
+var sessionsCollection *mongo.Collection
 var ctx = context.Background()
 
-func Connect() {
+func init() {
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGODB_CONNECTION_STRING"))
-	client, err := mongo.Connect(ctx, clientOptions)
+	err := error(nil)
+	client, err = mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		fmt.Println("Error connecting to MongoDB", err)
 	}
@@ -26,7 +27,7 @@ func Connect() {
 		fmt.Println("Error pinging MongoDB", err)
 	}
 	usersCollection = client.Database("photon").Collection("users")
-	clustersCollection = client.Database("photon").Collection("sessions")
+	sessionsCollection = client.Database("photon").Collection("sessions")
 
 }
 
