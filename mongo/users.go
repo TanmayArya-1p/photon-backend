@@ -18,6 +18,14 @@ func InsertUser(u *models.User) (models.User, error) {
 	return *u, nil
 }
 
+func UpdateUser(u models.User) (models.User, error) {
+	_, err := usersCollection.ReplaceOne(ctx, primitive.M{"_id": u.ID}, u)
+	if err != nil {
+		return models.User{}, fmt.Errorf("error updating user: %w", err)
+	}
+	return u, nil
+}
+
 func GetUserByID(id primitive.ObjectID) (models.User, error) {
 	var u models.User
 	err := usersCollection.FindOne(ctx, primitive.M{"_id": id}).Decode(&u)

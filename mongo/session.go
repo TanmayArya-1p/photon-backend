@@ -23,3 +23,11 @@ func GetSessionByID(id primitive.ObjectID) models.Session {
 	}
 	return s
 }
+
+func UpdateSession(s models.Session) models.Session {
+	_, err := sessionsCollection.ReplaceOne(ctx, primitive.M{"_id": s.ID}, s)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}

@@ -19,6 +19,8 @@ func main() {
 	})
 
 	http.Handle("/login", middleware.AuthTokenMiddleware(middleware.FetchUserMiddleware(http.HandlerFunc(handlers.Login))))
+	http.Handle("/create-session", middleware.AuthTokenMiddleware(middleware.FetchUserMiddleware(http.HandlerFunc(handlers.CreateSessionEndpoint))))
+	http.Handle("/join-session", middleware.AuthTokenMiddleware(middleware.FetchUserMiddleware(http.HandlerFunc(handlers.JoinSessionEndpoint))))
 
 	fmt.Println("Starting server at port", os.Getenv("PORT"))
 	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {

@@ -11,3 +11,8 @@ type UnpackedAccessToken struct {
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
+
+type UserSessionRequest struct {
+	SessionKey string `json:"session_key"`
+	SessionID  string `json:"session_id"`
+}
